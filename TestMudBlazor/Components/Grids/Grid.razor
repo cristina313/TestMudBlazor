@@ -1,0 +1,77 @@
+﻿@using TestMudBlazor.Components.Display
+@using TestMudBlazor.Contracts
+<h3>Grid</h3>
+<MudDataGrid T="Element"
+ServerData="@(state => ServerReload(state))"
+SortMode="SortMode.Single" Filterable="@IsFilterEnabled">
+
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" Sortable="false">
+            <CellTemplate>
+               @MyCellTemplate
+            </CellTemplate>
+
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Sign">
+           <CellTemplate>
+               @MyCellTemplate
+           </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position" />
+        <TemplateColumn Title="Custom" SortBy="@(x => $"{x.Sign} - {x.Name}")">
+            <CellTemplate>
+                @context.Item.Sign - @context.Item.Name
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+</MudDataGrid>
+@code {
+    [Parameter]
+    public bool IsFilterEnabled { get; set; }
+
+    [Parameter]
+    public RenderFragment MyCellTemplate { get; set; }
+
+    private int _CurrentCount = 0;
+    private int _TotalItems;
+    private string _SortInfo = string.Empty;
+    private IList<Element> Elements = new List<Element>();
+    private async Task<GridData<Element>> ServerReload(GridState<Element> state)
+    {
+        await LoadData(state.PageSize, state);
+
+        return new GridData<Element> { TotalItems = _TotalItems, Items = Elements };
+    }
+
+    private async Task LoadData(int pageSize, GridState<Element> state)
+    {
+        if (state.SortDefinitions.Any())
+        {
+            foreach (var item in state.SortDefinitions)
+            {
+                _SortInfo = _SortInfo + item.SortBy.ToString() + ' ' + item.Descending.ToString() + " ";
+            }
+        }
+
+        StateHasChanged();
+
+        Elements = DataRetrieve();
+
+        _TotalItems = Elements.ToList().Count();
+
+
+    }
+
+
+    private IList<Element> DataRetrieve()
+    {
+        var elements = new List<Element>();
+        for (var nr = 0; nr <= 50; nr++)
+        {
+            elements.Add(new Element(nr + 1, $"name{nr}", $"sign{nr}", nr));
+        }
+        return elements;
+    }
+}

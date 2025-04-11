@@ -1,0 +1,60 @@
+﻿@using System.Globalization
+<MudStack Row>
+    <MudTextField T="string">@(StartMonth != -1 ? $"{StartMonth}/{StartYear}" : "MM/yy")</MudTextField>
+    <MudIcon Icon="@Icons.Material.Filled.ArrowRightAlt" />
+    <MudTextField T="string">@(EndMonth != -1 ? $"{EndMonth}/{EndYear}" : "MM/yy")</MudTextField>
+    <MudIconButton Icon="@Icons.Material.Filled.CalendarMonth" OnClick="ToggleOpen" />
+</MudStack>
+<MudPopover Open="@_Open">
+    <MudStack Row>
+
+        <MudSelect T="int" @bind-Value="@StartMonth" >
+            @foreach (var month in _MonthIndexes)
+            {
+                <MudSelectItem Value="@month">@(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month))</MudSelectItem>
+            }
+        </MudSelect>
+        <MudNumericField @bind-Value=@StartYear Min="1980" Max="2025" Style="width:100px" />
+        <MudIcon Icon="@Icons.Material.Filled.ArrowRightAlt" />
+        <MudSelect T="int" @bind-Value="@EndMonth">
+            @foreach (var month in _MonthIndexes)
+            {
+                <MudSelectItem Value="@month">@(CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month))</MudSelectItem>
+            }
+        </MudSelect>
+        <MudNumericField @bind-Value=@EndYear Min="1980" Max="2025" Style="width:100px" />
+
+        <MudButton OnClick="@Ok" Class="ml-auto mr-n3 mb-1" Color="Color.Primary">OK</MudButton>
+        <MudButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Primary">X</MudButton>
+    </MudStack>
+</MudPopover>
+@code {
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+
+    private int StartMonth = -1;
+    private int EndMonth = -1;
+    private int StartYear = 2025;
+    private int EndYear = 2025;
+
+    private readonly IEnumerable<int> _MonthIndexes = Enumerable.Range(1, 12);
+    private readonly IEnumerable<int> _Years = Enumerable.Range(1980, 45);
+
+
+
+    private bool _Open = false;
+    private void ToggleOpen() => _Open = !_Open;
+
+    private void Ok()
+    {
+        ToggleOpen();
+        StartDate = new DateTime(StartYear, StartMonth, 1);
+        EndDate = new DateTime(EndYear, EndMonth, DateTime.DaysInMonth(EndYear, EndMonth));
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,44 @@
+﻿@using TestMudBlazor.Contracts
+@inherits ErrorBoundary
+@inject ISnackbar Snackbar
+@inject MessageLogService logService;
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else if (ErrorContent is not null)
+{
+    @ErrorContent(CurrentException)
+}
+else
+{
+    @ChildContent
+
+    @foreach (var exception in receivedExceptions)
+    {
+        Snackbar.Add(@exception.Message, Severity.Error);
+    }
+
+    Recover();
+}
+
+@code {
+    List<Exception> receivedExceptions = new();
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        receivedExceptions.Add(exception);
+        return base.OnErrorAsync(exception);
+    }
+
+    public new void Recover()
+    {
+        receivedExceptions.Clear();
+        base.Recover();
+    }
+
+    private void SaveLogs(Exception exception)
+    {
+        logService.AddMessageLog(exception.Message);
+    }
+}

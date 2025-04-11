@@ -1,0 +1,38 @@
+﻿@page "/"
+@using TestMudBlazor.Components.Date
+
+<PageTitle>Home</PageTitle>
+
+<h1>Test components</h1>
+
+<MudButton class="btn btn-primary" OnClick="@Blah"> @($"Click me{counter}")</MudButton>
+
+
+
+
+
+@code {
+    private int counter = 0;
+    private DateTime? _StartDate { get; set; }
+    private DateTime? _EndDate { get; set; }
+
+    private bool _Open = false;
+    private void ToggleOpen() => _Open = !_Open;
+
+    private void Blah()
+    {
+        counter++;
+    }
+
+    private string DateString { get; set; }
+
+    private void Ok()
+    {
+        if (_StartDate != null && _EndDate != null)
+        {
+            DateString = $"{_StartDate.Value.ToString("MM/yy")} - {_EndDate.Value.ToString("MM/yy")}";
+        }
+        ToggleOpen();
+        StateHasChanged();
+    }
+}

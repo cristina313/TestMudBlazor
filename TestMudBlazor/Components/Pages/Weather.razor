@@ -1,0 +1,76 @@
+﻿@page "/weather"
+@using TestMudBlazor.Components.Display
+@using TestMudBlazor.Components.Grids
+@using TestMudBlazor.Contracts
+@attribute [StreamRendering]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+<p role="status">Current count: @currentCount</p>
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <Grid IsFilterEnabled="true">
+        <MyCellTemplate>
+            <GridTree />
+        </MyCellTemplate>
+    </Grid>
+}
+
+@code {
+    private int currentCount = 0;
+    Random random = new Random();
+    private void IncrementCount()
+    {
+        currentCount++;
+        Console.WriteLine($"Current count {currentCount}");
+
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        AddW(summaries[random.Next(0, summaries.Length - 1)]);
+        StateHasChanged();
+    }
+    private WeatherForecast[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = summaries[Random.Shared.Next(summaries.Length)]
+            }).ToArray();
+
+    }
+
+
+    SizedQueue<string> maxWheather = new(5);
+
+    private void AddW(string wheatherType)
+    {
+        maxWheather.Enqueue(wheatherType);
+        if (currentCount == 7)
+        {
+            throw new ArgumentOutOfRangeException("Too much is too much. You know what I mean???");
+        }
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+        public int TemperatureC { get; set; }
+        public string? Summary { get; set; }
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    }
+}

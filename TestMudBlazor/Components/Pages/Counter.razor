@@ -1,0 +1,57 @@
+﻿@page "/counter"
+@using TestMudBlazor.Components.Date
+@using TestMudBlazor.Components.Display
+@using TestMudBlazor.Components.Grids
+@using TestMudBlazor.Contracts
+
+@inject IScrollManager ScrollManager
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @_CurrentCount</p>
+
+<MudButton class="btn btn-primary" OnClick="@Blah">Click me</MudButton>
+<Grid IsFilterEnabled="false">
+    <MyCellTemplate>
+        <GridText/>
+    </MyCellTemplate>
+</Grid>
+
+
+@code {
+    private int _CurrentCount = 0;
+    private void IncrementCount()
+    {
+        _CurrentCount++;
+        Console.WriteLine($"Current count {_CurrentCount}");
+        StateHasChanged();
+    }
+
+    private void Blah()
+    {
+        _CurrentCount++;
+        Console.WriteLine($"Current count {_CurrentCount}");
+        ParseUrl.GetFirstUrlParam(new Uri("https://localhost:58336/projects/10~0-203-73-1908", UriKind.Absolute));
+        StateHasChanged();
+    }
+
+
+
+    // protected override void OnInitialized()
+    // {
+    //     Elements = DataRetrieve();
+
+    // }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //    // await ScrollManager.ScrollToBottomAsync(".mud-table-container", ScrollBehavior.Smooth);
+    //    // await ScrollManager.ScrollIntoViewAsync("[id='11']", ScrollBehavior.Auto);
+    //   //  StateHasChanged();
+    // }
+
+
+
+}
